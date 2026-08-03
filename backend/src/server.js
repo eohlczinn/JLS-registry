@@ -33,6 +33,7 @@ app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(cors({ origin, credentials: true }));
 app.use(express.json({ limit: '2mb' }));
 app.use(rateLimit({ windowMs: 60_000, max: 180, standardHeaders: true }));
+app.use((req, _, next) => { if (req.url === '/api') req.url = '/'; else if (req.url.startsWith('/api/')) req.url = req.url.slice(4); next(); });
 app.get('/health', (_, res) => res.status(databaseReady ? 200 : 503).json({ status: databaseReady ? 'ok' : 'degraded', service: 'JL Registry API', database: databaseReady ? 'connected' : 'unavailable' }));
 app.use((req,res,next)=>{if(!databaseReady)return fail(res,503,'JL009','Banco de dados indisponível. Inicie o PostgreSQL e confira DATABASE_URL no backend/.env.');next();});
 
@@ -199,6 +200,7 @@ async function start() {
   } catch (error) {
     console.error('Banco de dados indisponível:', error.code || error.message);
   }
-  server.listen(process.env.PORT || 3333, () => console.log('JL Registry API ativa'));
+  if (process.env.VERCEL !== '1') server.listen(process.env.PORT || 3333, () => console.log('JL Registry API ativa'));
 }
 start();
+export default app;
