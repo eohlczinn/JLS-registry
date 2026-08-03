@@ -1,0 +1,1 @@
+export function validateLibrary({name,version,readme}){if(!name)return ['JL001','Estrutura da biblioteca inválida. Informe um nome.'];if(!version)return ['JL002','info{} não encontrado ou sem versão.'];if(!readme.includes('class Pack'))return ['JL006','Classe Pack não encontrada no arquivo principal.'];return null}
